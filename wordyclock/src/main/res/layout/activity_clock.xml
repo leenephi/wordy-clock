@@ -9,7 +9,7 @@
     android:background="#111111"
     tools:context="com.leenephi.wordyclock.ClockActivity">
 
-    <com.leenephi.wordyclock.AutoResizeTextView
+    <com.bluejamesbond.textjustify.TextViewEx
         android:id="@+id/wordy_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

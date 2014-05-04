@@ -5,13 +5,15 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.bluejamesbond.textjustify.TextViewEx;
+
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
 
 public class ClockActivity extends RoboActivity {
 
-    @InjectView (R.id.wordy_view) AutoResizeTextView mWordyView;
+    @InjectView (R.id.wordy_view)   TextViewEx mWordyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
