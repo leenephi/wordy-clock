@@ -2,10 +2,15 @@ package com.leenephi.wordyclock;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.bluejamesbond.textjustify.TextViewEx;
+
+import java.util.Timer;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
@@ -13,7 +18,8 @@ import roboguice.inject.InjectView;
 
 public class ClockActivity extends RoboActivity {
 
-    @InjectView (R.id.wordy_view)   TextViewEx mWordyView;
+    @InjectView (R.id.wordy_view)
+    TextView mWordyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +29,20 @@ public class ClockActivity extends RoboActivity {
         Typeface montserratRegular = Typeface.createFromAsset(
                 getAssets(), "fonts/montserrat_regular.ttf");
         mWordyView.setTypeface(montserratRegular);
-
         mWordyView.setText(Wordy.getWordy());
+
+        final Handler handler = new Handler();
+        Runnable minuteCall = new Runnable() {
+            @Override
+            public void run() {
+                mWordyView.setText(Wordy.getWordy());
+                handler.postDelayed(this, 60000);
+            }
+        };
+
+        // Start the minute timer right on the minute
+        handler.postDelayed(minuteCall, DateUtils.MINUTE_IN_MILLIS - System.currentTimeMillis()
+                % DateUtils.MINUTE_IN_MILLIS);
     }
 
 

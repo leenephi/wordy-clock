@@ -1,9 +1,16 @@
 package com.leenephi.wordyclock;
 
+import android.text.Html;
+import android.util.Log;
+
+import java.util.Calendar;
+
 /**
  * Created by smithsonln on 4/28/14.
  */
 public class Wordy {
+
+    private static final String COLOR = "#D95B43";
 
     private static final String[] MONTHS = {
             "january", "february", "march", "april", "may",
@@ -22,8 +29,8 @@ public class Wordy {
     };
 
     private static final String[] DAYS_OF_WEEK = {
-            "monday", "tuesday", "wednesday", "thursday",
-            "friday", "saturday", "sunday"
+            "sunday", "monday", "tuesday", "wednesday",
+            "thursday", "friday", "saturday"
     };
 
     private static final String[] HOURS = {
@@ -47,8 +54,14 @@ public class Wordy {
             "fifty-six", "fifty-seven", "fifty-eight", "fifty-nine"
     };
 
+    private static Calendar cal;
+
     private Wordy() {
         // static stuff, bro
+    }
+
+    static {
+        cal = Calendar.getInstance();
     }
 
     public static String getMonthWord(int month) {
@@ -71,35 +84,77 @@ public class Wordy {
         return MINUTES[--minute];
     }
 
-    public static String getWordy() {
-        StringBuilder builder = new StringBuilder();
+    private static String colorize(String word) {
+        return "<font color='" + COLOR + "'>" + word + "</font>";
+    }
 
+    public static android.text.Spanned getWordy() {
+        StringBuilder b = new StringBuilder();
+
+        // Calendar returns DAY_OF_WEEK, and starts at 1 for Sunday
+        // so we need to take 1 off since our Sunday starts at 0
+        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) - 1;
+//        Log.e("app", "dayOfWeek: " + dayOfWeek);
         for (int i = 0; i < DAYS_OF_WEEK.length; i++) {
-            builder.append(DAYS_OF_WEEK[i]);
-            builder.append(" ");
+            if (i == dayOfWeek) {
+                b.append(colorize(DAYS_OF_WEEK[i]));
+            } else {
+                b.append(DAYS_OF_WEEK[i]);
+            }
+            b.append(" ");
         }
 
+        // MONTH is returned starting at 0, so it fits with our array
+        int month = cal.get(Calendar.MONTH);
+//        Log.e("app", "month: " + month);
         for (int i = 0; i < MONTHS.length; i++) {
-            builder.append(MONTHS[i]);
-            builder.append(" ");
+            if (i == month) {
+                b.append(colorize(MONTHS[i]));
+            } else {
+                b.append(MONTHS[i]);
+            }
+            b.append(" ");
         }
 
+        // DAY_OF_MONTH also starts at 1
+        int day = cal.get(Calendar.DAY_OF_MONTH) - 1;
+//        Log.e("app", "day: " + day);
         for (int i = 0; i < DAYS.length; i++) {
-            builder.append(DAYS[i]);
-            builder.append(" ");
+            if (i == day) {
+                b.append(colorize(DAYS[i]));
+            } else {
+                b.append(DAYS[i]);
+            }
+            b.append(" ");
         }
 
+        // HOUR starts at 1
+        int hour = cal.get(Calendar.HOUR) - 1;
+//        Log.e("app", "hour: " + hour);
         for (int i = 0; i < HOURS.length; i++) {
-            builder.append(HOURS[i]);
-            builder.append(" ");
+            if (i == hour) {
+                b.append(colorize(HOURS[i]));
+            } else {
+                b.append(HOURS[i]);
+            }
+            b.append(" ");
         }
 
+        // MINUTE starts at 1
+        int minute = cal.get(Calendar.MINUTE) - 1;
+//        Log.e("app", "minute: " + minute);
         for (int i = 0; i < MINUTES.length; i++) {
-            builder.append(MINUTES[i]);
-            builder.append(" ");
+            if (i == minute) {
+                b.append(colorize(MINUTES[i]));
+            } else {
+                b.append(MINUTES[i]);
+            }
+            b.append(" ");
         }
 
-        return builder.toString();
+        // Turns all the <font color></font> into a spannable
+        // string that the TextView can recognize
+        return Html.fromHtml(b.toString());
     }
 
 }
