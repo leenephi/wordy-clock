@@ -1,7 +1,6 @@
 package com.leenephi.wordyclock;
 
 import android.text.Html;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -88,7 +87,8 @@ public class Wordy {
         return "<font color='" + COLOR + "'>" + word + "</font>";
     }
 
-    public static android.text.Spanned getWordy() {
+    public static android.text.Spanned getWords() {
+        cal.setTimeInMillis(System.currentTimeMillis());
         StringBuilder b = new StringBuilder();
 
         // Calendar returns DAY_OF_WEEK, and starts at 1 for Sunday

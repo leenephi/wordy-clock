@@ -15,6 +15,6 @@
         android:layout_height="wrap_content"
         android:textSize="16dp"
         android:gravity="center"
-        android:textColor="#555555"/>
+        android:textColor="#333333"/>
 
 </RelativeLayout>

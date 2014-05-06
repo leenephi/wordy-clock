@@ -1,16 +1,14 @@
 package com.leenephi.wordyclock;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-
-import com.bluejamesbond.textjustify.TextViewEx;
-
-import java.util.Timer;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
@@ -18,8 +16,9 @@ import roboguice.inject.InjectView;
 
 public class ClockActivity extends RoboActivity {
 
-    @InjectView (R.id.wordy_view)
-    TextView mWordyView;
+    private BroadcastReceiver mMinuteReceiver;
+
+    @InjectView (R.id.wordy_view) private TextView mWordyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,22 +28,35 @@ public class ClockActivity extends RoboActivity {
         Typeface montserratRegular = Typeface.createFromAsset(
                 getAssets(), "fonts/montserrat_regular.ttf");
         mWordyView.setTypeface(montserratRegular);
-        mWordyView.setText(Wordy.getWordy());
 
-        final Handler handler = new Handler();
-        Runnable minuteCall = new Runnable() {
+        mMinuteReceiver = new BroadcastReceiver() {
             @Override
-            public void run() {
-                mWordyView.setText(Wordy.getWordy());
-                handler.postDelayed(this, 60000);
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                    updateWords();
+                }
             }
         };
-
-        // Start the minute timer right on the minute
-        handler.postDelayed(minuteCall, DateUtils.MINUTE_IN_MILLIS - System.currentTimeMillis()
-                % DateUtils.MINUTE_IN_MILLIS);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateWords();
+        this.registerReceiver(mMinuteReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mMinuteReceiver != null) {
+            this.unregisterReceiver(mMinuteReceiver);
+        }
+    }
+
+    private void updateWords() {
+        mWordyView.setText(Wordy.getWords());
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
