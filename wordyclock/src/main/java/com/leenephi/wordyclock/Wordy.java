@@ -13,6 +13,7 @@ import java.util.Calendar;
 public class Wordy {
 
     private static final String COLOR = "#D95B43";
+    private static final String SECONDS_COLOR = "#2E8D95";
 
     private static final String[] MONTHS = {
             "january", "february", "march", "april", "may",
@@ -65,6 +66,11 @@ public class Wordy {
         cal = Calendar.getInstance();
     }
 
+    public static int getMillisLeft() {
+        cal.setTimeInMillis(System.currentTimeMillis());
+        return 1000 - cal.get(Calendar.MILLISECOND);
+    }
+
 //    public static String getMonthWord(int month) {
 //        return MONTHS[--month];
 //    }
@@ -85,18 +91,21 @@ public class Wordy {
 //        return MINUTES[--minute];
 //    }
 
-    private static void colorize(SpannableStringBuilder b, String text) {
+    private static void colorize(SpannableStringBuilder b, String text, String color) {
         int startIndex = b.length();
         int endIndex = b.length() + text.length();
 
-        b.append(text);
-        b.setSpan(new NonUnderlinedClickableSpan() {
+        NonUnderlinedClickableSpan span = new NonUnderlinedClickableSpan() {
             @Override
             public void onClick(View widget) {
                 // nada
                 // We only need a clickable span to be able to find their position
             }
-        }, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        };
+        span.setColor(color);
+
+        b.append(text);
+        b.setSpan(span, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
     public static Spanned getWords() {
@@ -109,7 +118,7 @@ public class Wordy {
 //        Log.e("app", "dayOfWeek: " + dayOfWeek);
         for (int i = 0; i < DAYS_OF_WEEK.length; i++) {
             if (i == dayOfWeek) {
-                colorize(b, DAYS_OF_WEEK[i]);
+                colorize(b, DAYS_OF_WEEK[i], COLOR);
             } else {
                 b.append(DAYS_OF_WEEK[i]);
             }
@@ -121,7 +130,7 @@ public class Wordy {
 //        Log.e("app", "month: " + month);
         for (int i = 0; i < MONTHS.length; i++) {
             if (i == month) {
-                colorize(b, MONTHS[i]);
+                colorize(b, MONTHS[i], COLOR);
             } else {
                 b.append(MONTHS[i]);
             }
@@ -133,7 +142,7 @@ public class Wordy {
 //        Log.e("app", "day: " + day);
         for (int i = 0; i < DAYS.length; i++) {
             if (i == day) {
-                colorize(b, DAYS[i]);
+                colorize(b, DAYS[i], COLOR);
             } else {
                 b.append(DAYS[i]);
             }
@@ -142,31 +151,35 @@ public class Wordy {
 
         // HOUR starts at 1
         int hour = cal.get(Calendar.HOUR) - 1;
+        // SECOND starts at 1 also
+        // We're using the same words from hours up to 'ten' for the seconds
+        int second = cal.get(Calendar.SECOND) - 1;
 //        Log.e("app", "hour: " + hour);
         for (int i = 0; i < HOURS.length; i++) {
-            if (i == hour) {
-                colorize(b, HOURS[i]);
+            if (i == second && i < 10) {
+                colorize(b, HOURS[i], SECONDS_COLOR);
+            } else if (i == hour) {
+                colorize(b, HOURS[i], COLOR);
             } else {
                 b.append(HOURS[i]);
             }
             b.append(" ");
         }
 
+        // Here, using same words from minutes for seconds from 'eleven' to 'fifty-nine'
         // MINUTE starts at 1
         int minute = cal.get(Calendar.MINUTE) - 1;
 //        Log.e("app", "minute: " + minute);
         for (int i = 0; i < MINUTES.length; i++) {
-            if (i == minute) {
-                colorize(b, MINUTES[i]);
+            if (i == second && i >= 10) {
+                colorize(b, MINUTES[i], SECONDS_COLOR);
+            } else if (i == minute) {
+                colorize(b, MINUTES[i], COLOR);
             } else {
                 b.append(MINUTES[i]);
             }
             b.append(" ");
         }
-
-        // Turns all the <font color></font> into a spannable
-        // string that the TextView can recognize
-//        return Html.fromHtml(b.toString());
 
         return b;
     }

@@ -10,6 +10,12 @@ import android.view.View;
  */
 public class NonUnderlinedClickableSpan extends ClickableSpan {
 
+    private int mColor;
+
+    public NonUnderlinedClickableSpan() {
+        super();
+    }
+
     @Override
     public void onClick(View widget) {
 
@@ -17,7 +23,11 @@ public class NonUnderlinedClickableSpan extends ClickableSpan {
 
     @Override
     public void updateDrawState(TextPaint ds) {
-        ds.setColor(Color.parseColor("#D95B43"));
+        ds.setColor(mColor);
         ds.setUnderlineText(false);
+    }
+
+    public void setColor(String color) {
+        mColor = Color.parseColor(color);
     }
 }

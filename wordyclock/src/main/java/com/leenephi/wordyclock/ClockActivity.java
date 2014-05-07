@@ -1,9 +1,5 @@
 package com.leenephi.wordyclock;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.GestureDetector;
@@ -17,7 +13,7 @@ import roboguice.inject.InjectView;
 
 public class ClockActivity extends RoboActivity implements GestureDetector.OnDoubleTapListener{
 
-    private BroadcastReceiver mMinuteReceiver;
+    private Runnable mTimer;
 
     @InjectView (R.id.wordy_view) private SpannedTextView mWordyView;
 
@@ -30,12 +26,11 @@ public class ClockActivity extends RoboActivity implements GestureDetector.OnDou
                 getAssets(), "fonts/montserrat_regular.ttf");
         mWordyView.setTypeface(montserratRegular);
 
-        mMinuteReceiver = new BroadcastReceiver() {
+        mTimer = new Runnable() {
             @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
-                    updateWords();
-                }
+            public void run() {
+                updateWords();
+                mWordyView.postDelayed(this, Wordy.getMillisLeft());
             }
         };
     }
@@ -44,23 +39,19 @@ public class ClockActivity extends RoboActivity implements GestureDetector.OnDou
     protected void onResume() {
         super.onResume();
         updateWords();
-        this.registerReceiver(mMinuteReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+        mWordyView.postDelayed(mTimer, Wordy.getMillisLeft());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mMinuteReceiver != null) {
-            this.unregisterReceiver(mMinuteReceiver);
-        }
+        mWordyView.removeCallbacks(mTimer);
     }
 
 
 
     private void updateWords() {
         mWordyView.setText(Wordy.getWords());
-//        ClickableSpan spans[] = mWordyView.getNonUnderlinedClickableSpans();
-//        Log.i("NonClickableSpans: ", String.valueOf(spans.length));
     }
 
     @Override
