@@ -1,6 +1,9 @@
 package com.leenephi.wordyclock;
 
-import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.view.View;
 
 import java.util.Calendar;
 
@@ -56,40 +59,49 @@ public class Wordy {
     private static Calendar cal;
 
     private Wordy() {
-        // static stuff, bro
     }
 
     static {
         cal = Calendar.getInstance();
     }
 
-    public static String getMonthWord(int month) {
-        return MONTHS[--month];
+//    public static String getMonthWord(int month) {
+//        return MONTHS[--month];
+//    }
+//
+//    public static String getDayWord(int day) {
+//        return DAYS[--day];
+//    }
+//
+//    public static String getDayOfWeekWord(int day) {
+//        return DAYS_OF_WEEK[--day];
+//    }
+//
+//    public static String getHourWord(int hour) {
+//        return HOURS[--hour];
+//    }
+//
+//    public static String getMinuteWord(int minute) {
+//        return MINUTES[--minute];
+//    }
+
+    private static void colorize(SpannableStringBuilder b, String text) {
+        int startIndex = b.length();
+        int endIndex = b.length() + text.length();
+
+        b.append(text);
+        b.setSpan(new NonUnderlinedClickableSpan() {
+            @Override
+            public void onClick(View widget) {
+                // nada
+                // We only need a clickable span to be able to find their position
+            }
+        }, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    public static String getDayWord(int day) {
-        return DAYS[--day];
-    }
-
-    public static String getDayOfWeekWord(int day) {
-        return DAYS_OF_WEEK[--day];
-    }
-
-    public static String getHourWord(int hour) {
-        return HOURS[--hour];
-    }
-
-    public static String getMinuteWord(int minute) {
-        return MINUTES[--minute];
-    }
-
-    private static String colorize(String word) {
-        return "<font color='" + COLOR + "'>" + word + "</font>";
-    }
-
-    public static android.text.Spanned getWords() {
+    public static Spanned getWords() {
         cal.setTimeInMillis(System.currentTimeMillis());
-        StringBuilder b = new StringBuilder();
+        SpannableStringBuilder b = new SpannableStringBuilder();
 
         // Calendar returns DAY_OF_WEEK, and starts at 1 for Sunday
         // so we need to take 1 off since our Sunday starts at 0
@@ -97,7 +109,7 @@ public class Wordy {
 //        Log.e("app", "dayOfWeek: " + dayOfWeek);
         for (int i = 0; i < DAYS_OF_WEEK.length; i++) {
             if (i == dayOfWeek) {
-                b.append(colorize(DAYS_OF_WEEK[i]));
+                colorize(b, DAYS_OF_WEEK[i]);
             } else {
                 b.append(DAYS_OF_WEEK[i]);
             }
@@ -109,7 +121,7 @@ public class Wordy {
 //        Log.e("app", "month: " + month);
         for (int i = 0; i < MONTHS.length; i++) {
             if (i == month) {
-                b.append(colorize(MONTHS[i]));
+                colorize(b, MONTHS[i]);
             } else {
                 b.append(MONTHS[i]);
             }
@@ -121,7 +133,7 @@ public class Wordy {
 //        Log.e("app", "day: " + day);
         for (int i = 0; i < DAYS.length; i++) {
             if (i == day) {
-                b.append(colorize(DAYS[i]));
+                colorize(b, DAYS[i]);
             } else {
                 b.append(DAYS[i]);
             }
@@ -133,7 +145,7 @@ public class Wordy {
 //        Log.e("app", "hour: " + hour);
         for (int i = 0; i < HOURS.length; i++) {
             if (i == hour) {
-                b.append(colorize(HOURS[i]));
+                colorize(b, HOURS[i]);
             } else {
                 b.append(HOURS[i]);
             }
@@ -145,7 +157,7 @@ public class Wordy {
 //        Log.e("app", "minute: " + minute);
         for (int i = 0; i < MINUTES.length; i++) {
             if (i == minute) {
-                b.append(colorize(MINUTES[i]));
+                colorize(b, MINUTES[i]);
             } else {
                 b.append(MINUTES[i]);
             }
@@ -154,7 +166,9 @@ public class Wordy {
 
         // Turns all the <font color></font> into a spannable
         // string that the TextView can recognize
-        return Html.fromHtml(b.toString());
+//        return Html.fromHtml(b.toString());
+
+        return b;
     }
 
 }

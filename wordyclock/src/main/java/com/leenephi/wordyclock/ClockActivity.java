@@ -6,19 +6,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
+import android.view.MotionEvent;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
 
 
-public class ClockActivity extends RoboActivity {
+public class ClockActivity extends RoboActivity implements GestureDetector.OnDoubleTapListener{
 
     private BroadcastReceiver mMinuteReceiver;
 
-    @InjectView (R.id.wordy_view) private TextView mWordyView;
+    @InjectView (R.id.wordy_view) private SpannedTextView mWordyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +55,12 @@ public class ClockActivity extends RoboActivity {
         }
     }
 
+
+
     private void updateWords() {
         mWordyView.setText(Wordy.getWords());
+//        ClickableSpan spans[] = mWordyView.getNonUnderlinedClickableSpans();
+//        Log.i("NonClickableSpans: ", String.valueOf(spans.length));
     }
 
     @Override
@@ -75,5 +80,22 @@ public class ClockActivity extends RoboActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        // stuff!
+
+        return true;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        return false;
     }
 }
