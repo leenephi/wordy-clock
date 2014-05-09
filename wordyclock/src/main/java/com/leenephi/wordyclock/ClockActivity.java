@@ -48,10 +48,8 @@ public class ClockActivity extends RoboActivity implements GestureDetector.OnDou
         mWordyView.removeCallbacks(mTimer);
     }
 
-
-
     private void updateWords() {
-        mWordyView.setText(Wordy.getWords());
+//        mWordyView.setText(Wordy.getWords());
     }
 
     @Override

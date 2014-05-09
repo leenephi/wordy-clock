@@ -6,5 +6,8 @@
     <string name="action_settings">Settings</string>
 
     <string name="app_description">Wordy Clock Live Wallpaper</string>
+    <string name="theme_prefs_title">Wordy Theme</string>
+    <string name="top_padding_prefs_title">Top Padding</string>
+    <string name="bottom_padding_prefs_title">Bottom Padding</string>
 
 </resources>

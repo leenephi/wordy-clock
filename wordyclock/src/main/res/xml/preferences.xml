@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="theme"
+        android:title="@string/theme_prefs_title"
+        android:entries="@array/themes"
+        android:entryValues="@array/theme_values"/>
+    <ListPreference
+        android:key="top_padding"
+        android:title="@string/top_padding_prefs_title"
+        android:entries="@array/top_padding"
+        android:entryValues="@array/top_padding_values"/>
+    <ListPreference
+        android:key="bottom_padding"
+        android:title="@string/bottom_padding_prefs_title"
+        android:entries="@array/bottom_padding"
+        android:entryValues="@array/bottom_padding_values"/>
+</PreferenceScreen>

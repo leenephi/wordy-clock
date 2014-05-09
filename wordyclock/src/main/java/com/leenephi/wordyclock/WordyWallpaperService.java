@@ -1,12 +1,14 @@
 package com.leenephi.wordyclock;
 
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.service.wallpaper.WallpaperService;
-import android.text.DynamicLayout;
 import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.util.TypedValue;
 import android.view.SurfaceHolder;
@@ -23,15 +25,38 @@ public class WordyWallpaperService extends WallpaperService {
 
     public class WordyViewEngine extends Engine {
 
+        // Theme order = { background, default text, main color text, seconds text }
+        private final int BACKGROUND = 0;
+        private final int DEFAULT_TEXT = 1;
+        private final int COLOR_TEXT = 2;
+        private final int SECONDS_TEXT = 3;
+        private final String THEMES[][] = {
+                {"#111111", "#333333", "#D95B43", "#2E8D95"},    // dark theme
+                {"#ECE5CE", "#F1D4AF", "#E08E79", "#C5E0DC"},   // light theme
+                {"#2E2633", "#555152", "#DCE9BE", "#99173C"}    // other theme
+        };
+
+        // Number to divide the canvas width by for padding
+        private final int PADDING[] = {
+                20,     // small - default for left/right padding
+                15,     // medium
+                10      // large
+        };
+
+        private int mTheme = 0;
+
         private boolean mInitialized = false;
-        private int mPadding;
+        private int mTopPadding = 0;
+        private int mBottomPadding = 0;
+        private int mLeftRightPadding;
         private int mNewWidth;
-        private DynamicLayout mLayout;
+        private StaticLayout mLayout;
 
         private boolean mVisible = false;
 
         private final Handler mHandler;
         private final Runnable mUpdate;
+        private SharedPreferences mSharedPreferences;
 
         private TextPaint mDefault;
 
@@ -44,6 +69,10 @@ public class WordyWallpaperService extends WallpaperService {
                 }
             };
 
+            mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(
+                    WordyWallpaperService.this);
+            mTheme = Integer.parseInt(mSharedPreferences.getString("theme", "0"));
+
             Typeface montserratRegular = Typeface.createFromAsset(
                     getAssets(), "fonts/montserrat_regular.ttf");
 
@@ -51,7 +80,7 @@ public class WordyWallpaperService extends WallpaperService {
                     TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
 
             mDefault = new TextPaint();
-            mDefault.setColor(Color.parseColor("#333333"));
+            mDefault.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
             mDefault.setTypeface(montserratRegular);
             mDefault.setTextSize(fontSizePixels);
         }
@@ -89,20 +118,28 @@ public class WordyWallpaperService extends WallpaperService {
 
                 if (canvas != null) {
                     if (!mInitialized) {
+                        int topPadding = Integer.parseInt(
+                                mSharedPreferences.getString("top_padding", "0"));
+                        int bottomPadding = Integer.parseInt(
+                                mSharedPreferences.getString("bottom_padding", "0"));
+
                         int oldWidth = canvas.getWidth();
-                        mPadding = oldWidth / 20;
-                        mNewWidth = oldWidth - (2 * mPadding);
+                        mLeftRightPadding = oldWidth / PADDING[0];
+                        mTopPadding = oldWidth / PADDING[topPadding];
+                        mBottomPadding = oldWidth / PADDING[bottomPadding];
+                        mNewWidth = oldWidth - (2 * mLeftRightPadding);
 
                         mInitialized = true;
                     }
 
-                    mLayout = new DynamicLayout(
-                            Wordy.getWords(), mDefault, mNewWidth,
-                            Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+                    mLayout = new StaticLayout(
+                            Wordy.getWords(THEMES[mTheme][COLOR_TEXT],
+                                    THEMES[mTheme][SECONDS_TEXT]),
+                            mDefault, mNewWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
 
-                    canvas.drawColor(Color.parseColor("#111111"));
+                    canvas.drawColor(Color.parseColor(THEMES[mTheme][BACKGROUND]));
                     canvas.save();
-                    canvas.translate(mPadding, mPadding);
+                    canvas.translate(mLeftRightPadding, mLeftRightPadding);
                     mLayout.draw(canvas);
                     canvas.restore();
                 }

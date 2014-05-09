@@ -12,9 +12,6 @@ import java.util.Calendar;
  */
 public class Wordy {
 
-    private static final String COLOR = "#D95B43";
-    private static final String SECONDS_COLOR = "#2E8D95";
-
     private static final String[] MONTHS = {
             "january", "february", "march", "april", "may",
             "june", "july", "august", "september", "october",
@@ -108,7 +105,7 @@ public class Wordy {
         b.setSpan(span, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    public static Spanned getWords() {
+    public static Spanned getWords(String defaultColor, String secondsColor) {
         cal.setTimeInMillis(System.currentTimeMillis());
         SpannableStringBuilder b = new SpannableStringBuilder();
 
@@ -118,7 +115,7 @@ public class Wordy {
 //        Log.e("app", "dayOfWeek: " + dayOfWeek);
         for (int i = 0; i < DAYS_OF_WEEK.length; i++) {
             if (i == dayOfWeek) {
-                colorize(b, DAYS_OF_WEEK[i], COLOR);
+                colorize(b, DAYS_OF_WEEK[i], defaultColor);
             } else {
                 b.append(DAYS_OF_WEEK[i]);
             }
@@ -130,7 +127,7 @@ public class Wordy {
 //        Log.e("app", "month: " + month);
         for (int i = 0; i < MONTHS.length; i++) {
             if (i == month) {
-                colorize(b, MONTHS[i], COLOR);
+                colorize(b, MONTHS[i], defaultColor);
             } else {
                 b.append(MONTHS[i]);
             }
@@ -142,7 +139,7 @@ public class Wordy {
 //        Log.e("app", "day: " + day);
         for (int i = 0; i < DAYS.length; i++) {
             if (i == day) {
-                colorize(b, DAYS[i], COLOR);
+                colorize(b, DAYS[i], defaultColor);
             } else {
                 b.append(DAYS[i]);
             }
@@ -157,9 +154,9 @@ public class Wordy {
 //        Log.e("app", "hour: " + hour);
         for (int i = 0; i < HOURS.length; i++) {
             if (i == second && i < 10) {
-                colorize(b, HOURS[i], SECONDS_COLOR);
+                colorize(b, HOURS[i], secondsColor);
             } else if (i == hour) {
-                colorize(b, HOURS[i], COLOR);
+                colorize(b, HOURS[i], defaultColor);
             } else {
                 b.append(HOURS[i]);
             }
@@ -172,9 +169,9 @@ public class Wordy {
 //        Log.e("app", "minute: " + minute);
         for (int i = 0; i < MINUTES.length; i++) {
             if (i == second && i >= 10) {
-                colorize(b, MINUTES[i], SECONDS_COLOR);
+                colorize(b, MINUTES[i], secondsColor);
             } else if (i == minute) {
-                colorize(b, MINUTES[i], COLOR);
+                colorize(b, MINUTES[i], defaultColor);
             } else {
                 b.append(MINUTES[i]);
             }
