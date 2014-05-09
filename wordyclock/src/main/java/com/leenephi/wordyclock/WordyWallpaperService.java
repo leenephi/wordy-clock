@@ -23,7 +23,8 @@ public class WordyWallpaperService extends WallpaperService {
         return new WordyViewEngine();
     }
 
-    public class WordyViewEngine extends Engine {
+    public class WordyViewEngine extends Engine
+            implements SharedPreferences.OnSharedPreferenceChangeListener {
 
         // Theme order = { background, default text, main color text, seconds text }
         private final int BACKGROUND = 0;
@@ -32,8 +33,8 @@ public class WordyWallpaperService extends WallpaperService {
         private final int SECONDS_TEXT = 3;
         private final String THEMES[][] = {
                 {"#111111", "#333333", "#D95B43", "#2E8D95"},    // dark theme
-                {"#ECE5CE", "#F1D4AF", "#E08E79", "#C5E0DC"},   // light theme
-                {"#2E2633", "#555152", "#DCE9BE", "#99173C"}    // other theme
+                {"#F7F7F5", "#D5D5D5", "#F45D4C", "#80B990"},   // light theme
+                {"#000000", "#222222", "#DCE9BE", "#99173C"}    // vampire theme
         };
 
         // Number to divide the canvas width by for padding
@@ -43,22 +44,21 @@ public class WordyWallpaperService extends WallpaperService {
                 10      // large
         };
 
-        private int mTheme = 0;
+        private final Handler mHandler;
+        private final Runnable mUpdate;
 
-        private boolean mInitialized = false;
+        private int mTheme = 0;
         private int mTopPadding = 0;
         private int mBottomPadding = 0;
         private int mLeftRightPadding;
         private int mNewWidth;
-        private StaticLayout mLayout;
 
+        private boolean mInitialized = false;
         private boolean mVisible = false;
 
-        private final Handler mHandler;
-        private final Runnable mUpdate;
+        private StaticLayout mLayout;
         private SharedPreferences mSharedPreferences;
-
-        private TextPaint mDefault;
+        private TextPaint mDefaultText;
 
         public WordyViewEngine() {
             mHandler = new Handler();
@@ -71,6 +71,7 @@ public class WordyWallpaperService extends WallpaperService {
 
             mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(
                     WordyWallpaperService.this);
+            mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
             mTheme = Integer.parseInt(mSharedPreferences.getString("theme", "0"));
 
             Typeface montserratRegular = Typeface.createFromAsset(
@@ -79,10 +80,10 @@ public class WordyWallpaperService extends WallpaperService {
             float fontSizePixels = TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
 
-            mDefault = new TextPaint();
-            mDefault.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
-            mDefault.setTypeface(montserratRegular);
-            mDefault.setTextSize(fontSizePixels);
+            mDefaultText = new TextPaint();
+            mDefaultText.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
+            mDefaultText.setTypeface(montserratRegular);
+            mDefaultText.setTextSize(fontSizePixels);
         }
 
         @Override
@@ -94,6 +95,19 @@ public class WordyWallpaperService extends WallpaperService {
             } else {
                 mHandler.removeCallbacks(mUpdate);
             }
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if (key.equals("theme")) {
+                int theme = Integer.parseInt(sharedPreferences.getString(key, "0"));
+                updateTheme(theme);
+            }
+        }
+
+        private void updateTheme(int theme) {
+            mTheme = theme;
+            mDefaultText.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
         }
 
         @Override
@@ -135,7 +149,7 @@ public class WordyWallpaperService extends WallpaperService {
                     mLayout = new StaticLayout(
                             Wordy.getWords(THEMES[mTheme][COLOR_TEXT],
                                     THEMES[mTheme][SECONDS_TEXT]),
-                            mDefault, mNewWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+                            mDefaultText, mNewWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
 
                     canvas.drawColor(Color.parseColor(THEMES[mTheme][BACKGROUND]));
                     canvas.save();

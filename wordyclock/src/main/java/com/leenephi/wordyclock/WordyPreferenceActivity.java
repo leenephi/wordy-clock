@@ -17,7 +17,7 @@ public class WordyPreferenceActivity extends PreferenceActivity {
                 .replace(android.R.id.content, new WordyPreferenceFragment()).commit();
     }
 
-    public class WordyPreferenceFragment extends PreferenceFragment {
+    public static class WordyPreferenceFragment extends PreferenceFragment {
 
         public WordyPreferenceFragment() {
 
