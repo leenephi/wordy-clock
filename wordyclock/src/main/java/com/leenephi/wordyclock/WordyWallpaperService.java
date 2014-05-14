@@ -40,8 +40,14 @@ public class WordyWallpaperService extends WallpaperService {
         // Number to divide the canvas width by for padding
         private final int PADDING[] = {
                 20,     // small - default for left/right padding
-                15,     // medium
-                10      // large
+                10,     // medium
+                4      // large
+        };
+
+        private final float FONT_SIZE[] = {
+                16.00f,
+                15.00f,
+                14.00f
         };
 
         private final Handler mHandler;
@@ -49,7 +55,6 @@ public class WordyWallpaperService extends WallpaperService {
 
         private int mTheme = 0;
         private int mTopPadding = 0;
-        private int mBottomPadding = 0;
         private int mLeftRightPadding;
         private int mNewWidth;
 
@@ -77,13 +82,9 @@ public class WordyWallpaperService extends WallpaperService {
             Typeface montserratRegular = Typeface.createFromAsset(
                     getAssets(), "fonts/montserrat_regular.ttf");
 
-            float fontSizePixels = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
-
             mDefaultText = new TextPaint();
             mDefaultText.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
             mDefaultText.setTypeface(montserratRegular);
-            mDefaultText.setTextSize(fontSizePixels);
         }
 
         @Override
@@ -102,12 +103,22 @@ public class WordyWallpaperService extends WallpaperService {
             if (key.equals("theme")) {
                 int theme = Integer.parseInt(sharedPreferences.getString(key, "0"));
                 updateTheme(theme);
+            } else {
+                mInitialized = false;
             }
         }
 
         private void updateTheme(int theme) {
             mTheme = theme;
             mDefaultText.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
+        }
+
+        private void setFontSize(float fontSize) {
+            float fontSizePixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP, fontSize,
+                    getResources().getDisplayMetrics());
+
+            mDefaultText.setTextSize(fontSizePixels);
         }
 
         @Override
@@ -133,15 +144,14 @@ public class WordyWallpaperService extends WallpaperService {
                 if (canvas != null) {
                     if (!mInitialized) {
                         int topPadding = Integer.parseInt(
-                                mSharedPreferences.getString("top_padding", "0"));
-                        int bottomPadding = Integer.parseInt(
-                                mSharedPreferences.getString("bottom_padding", "0"));
+                                mSharedPreferences.getString("top_bottom_padding", "0"));
 
                         int oldWidth = canvas.getWidth();
                         mLeftRightPadding = oldWidth / PADDING[0];
                         mTopPadding = oldWidth / PADDING[topPadding];
-                        mBottomPadding = oldWidth / PADDING[bottomPadding];
                         mNewWidth = oldWidth - (2 * mLeftRightPadding);
+
+                        setFontSize(FONT_SIZE[topPadding]);
 
                         mInitialized = true;
                     }
@@ -149,11 +159,12 @@ public class WordyWallpaperService extends WallpaperService {
                     mLayout = new StaticLayout(
                             Wordy.getWords(THEMES[mTheme][COLOR_TEXT],
                                     THEMES[mTheme][SECONDS_TEXT]),
-                            mDefaultText, mNewWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0.0f, false);
+                            mDefaultText, mNewWidth, Layout.Alignment.ALIGN_CENTER,
+                            1.0f, 0.0f, false);
 
                     canvas.drawColor(Color.parseColor(THEMES[mTheme][BACKGROUND]));
                     canvas.save();
-                    canvas.translate(mLeftRightPadding, mLeftRightPadding);
+                    canvas.translate(mLeftRightPadding, mTopPadding);
                     mLayout.draw(canvas);
                     canvas.restore();
                 }
