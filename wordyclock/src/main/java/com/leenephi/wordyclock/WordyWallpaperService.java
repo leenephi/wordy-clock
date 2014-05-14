@@ -14,7 +14,7 @@ import android.util.TypedValue;
 import android.view.SurfaceHolder;
 
 /**
- * Created by smithsonln on 5/7/14.
+ * Created by leenephi on 5/7/14.
  */
 public class WordyWallpaperService extends WallpaperService {
 

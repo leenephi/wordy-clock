@@ -5,7 +5,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
 /**
- * Created by smithsonln on 5/8/14.
+ * Created by leenephi on 5/8/14.
  */
 public class WordyPreferenceActivity extends PreferenceActivity {
 

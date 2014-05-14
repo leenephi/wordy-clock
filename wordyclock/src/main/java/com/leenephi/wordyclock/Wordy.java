@@ -9,7 +9,7 @@ import android.text.style.ForegroundColorSpan;
 import java.util.Calendar;
 
 /**
- * Created by smithsonln on 4/28/14.
+ * Created by leenephi on 4/28/14.
  */
 public class Wordy {
 
