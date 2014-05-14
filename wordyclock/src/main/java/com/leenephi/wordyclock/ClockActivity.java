@@ -6,6 +6,7 @@ import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.widget.TextView;
 
 import roboguice.activity.RoboActivity;
 import roboguice.inject.InjectView;
@@ -15,7 +16,7 @@ public class ClockActivity extends RoboActivity implements GestureDetector.OnDou
 
     private Runnable mTimer;
 
-    @InjectView (R.id.wordy_view) private SpannedTextView mWordyView;
+    @InjectView (R.id.wordy_view) private TextView mWordyView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
