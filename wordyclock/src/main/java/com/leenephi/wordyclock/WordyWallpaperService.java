@@ -37,19 +37,6 @@ public class WordyWallpaperService extends WallpaperService {
                 {"#000000", "#222222", "#DCE9BE", "#99173C"}    // vampire theme
         };
 
-        // Number to divide the canvas width by for padding
-        private final int PADDING[] = {
-                20,     // small - default for left/right padding
-                10,     // medium
-                4      // large
-        };
-
-        private final float FONT_SIZE[] = {
-                16.00f,
-                15.00f,
-                14.00f
-        };
-
         private final Handler mHandler;
         private final Runnable mUpdate;
 
@@ -61,7 +48,6 @@ public class WordyWallpaperService extends WallpaperService {
         private boolean mInitialized = false;
         private boolean mVisible = false;
 
-        private StaticLayout mLayout;
         private SharedPreferences mSharedPreferences;
         private TextPaint mDefaultText;
 
@@ -113,12 +99,9 @@ public class WordyWallpaperService extends WallpaperService {
             mDefaultText.setColor(Color.parseColor(THEMES[mTheme][DEFAULT_TEXT]));
         }
 
-        private void setFontSize(float fontSize) {
-            float fontSizePixels = TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, fontSize,
+        private float getPixelsFromDp(int dp) {
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
                     getResources().getDisplayMetrics());
-
-            mDefaultText.setTextSize(fontSizePixels);
         }
 
         @Override
@@ -143,20 +126,22 @@ public class WordyWallpaperService extends WallpaperService {
 
                 if (canvas != null) {
                     if (!mInitialized) {
-                        int topPadding = Integer.parseInt(
-                                mSharedPreferences.getString("top_bottom_padding", "0"));
+                        int topPaddingDp = Integer.parseInt(
+                                mSharedPreferences.getString("top_padding", "10"));
+                        mTopPadding = (int) getPixelsFromDp(topPaddingDp);
 
                         int oldWidth = canvas.getWidth();
-                        mLeftRightPadding = oldWidth / PADDING[0];
-                        mTopPadding = oldWidth / PADDING[topPadding];
+                        mLeftRightPadding = oldWidth / 20;
                         mNewWidth = oldWidth - (2 * mLeftRightPadding);
 
-                        setFontSize(FONT_SIZE[topPadding]);
+                        int fontSizeDp = Integer.parseInt(
+                                mSharedPreferences.getString("text_size", "12"));
+                        mDefaultText.setTextSize(getPixelsFromDp(fontSizeDp));
 
                         mInitialized = true;
                     }
 
-                    mLayout = new StaticLayout(
+                    StaticLayout layout = new StaticLayout(
                             Wordy.getWords(THEMES[mTheme][COLOR_TEXT],
                                     THEMES[mTheme][SECONDS_TEXT]),
                             mDefaultText, mNewWidth, Layout.Alignment.ALIGN_CENTER,
@@ -165,7 +150,7 @@ public class WordyWallpaperService extends WallpaperService {
                     canvas.drawColor(Color.parseColor(THEMES[mTheme][BACKGROUND]));
                     canvas.save();
                     canvas.translate(mLeftRightPadding, mTopPadding);
-                    mLayout.draw(canvas);
+                    layout.draw(canvas);
                     canvas.restore();
                 }
             } finally {
